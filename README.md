@@ -115,12 +115,11 @@ sudo reboot
 
 ## 测试环境
 
-- **系统**: Fedora Linux 44
-- **内核**: 7.0.10
-- **initramfs**: dracut
-- ** bootloader**: GRUB with BLS
+- **系统**: Linux Mint / Ubuntu / Debian
+- ** initramfs**: initramfs-tools
+- ** bootloader**: GRUB
 
-理论上适用于任何使用 dracut 的发行版（Fedora, RHEL, CentOS, SUSE 等）。
+本分支专为 Debian 系（如 Linux Mint, Ubuntu, Debian 等）修改，不再依赖 dracut 或 BLS。
 
 ## 项目结构
 
