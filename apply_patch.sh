@@ -1,6 +1,6 @@
 #!/bin/bash
 # apply_patch.sh - 安装 HONOR MagicBook 14 2026 触摸板补丁
-# 适用于 Fedora / dracut 系统
+# 适用于 Debian / Linux Mint / Ubuntu 系统
 
 set -euo pipefail
 
@@ -43,26 +43,13 @@ fi
 echo "  备份保存到: $BACKUP_DIR"
 echo
 
-# 获取内核版本
-KERNEL_VERSION=$(uname -r)
-echo "[2/6] 内核版本: $KERNEL_VERSION"
-
-# 获取 BLS entry
-BLS_ENTRY=$(ls /boot/loader/entries/*-${KERNEL_VERSION}.conf 2>/dev/null | head -1)
-
-if [[ -z "$BLS_ENTRY" ]]; then
-    echo "警告: 未找到 BLS 条目，尝试查找其他条目..."
-    BLS_ENTRY=$(ls /boot/loader/entries/*.conf 2>/dev/null | head -1)
-fi
-
-if [[ -n "$BLS_ENTRY" ]]; then
-    echo "  找到 BLS 条目: $BLS_ENTRY"
-    BLS_BASENAME=$(basename "$BLS_ENTRY")
-    BLS_BACKUP="$BACKUP_DIR/$BLS_BASENAME"
-    cp "$BLS_ENTRY" "$BLS_BACKUP"
-    echo "  备份: $BLS_ENTRY -> $BLS_BACKUP"
+# 备份 grub 配置
+echo "[2/6] 备份引导配置..."
+if [[ -f /etc/default/grub ]]; then
+    cp /etc/default/grub "$BACKUP_DIR/grub"
+    echo "  备份: /etc/default/grub -> $BACKUP_DIR/grub"
 else
-    echo "警告: 未找到 BLS 条目"
+    echo "  警告: /etc/default/grub 不存在"
 fi
 echo
 
@@ -104,19 +91,27 @@ chmod 644 /boot/acpi_override.cpio
 echo "  创建: /boot/acpi_override.cpio"
 echo
 
-# 配置 GRUB/BLS
+# 配置 GRUB
 echo "[5/6] 配置引导加载器..."
 
-if [[ -n "$BLS_ENTRY" ]] && [[ -f "$BLS_ENTRY" ]]; then
-    # 检查是否已经有 early initrd
-    if grep -q "initrd.*acpi_override.cpio" "$BLS_ENTRY"; then
-        echo "  BLS 已配置使用 acpi_override.cpio"
+if [[ -f /etc/default/grub ]]; then
+    if grep -q "GRUB_EARLY_INITRD_LINUX_CUSTOM=" /etc/default/grub; then
+        sed -i 's/^GRUB_EARLY_INITRD_LINUX_CUSTOM=.*/GRUB_EARLY_INITRD_LINUX_CUSTOM="acpi_override.cpio"/' /etc/default/grub
+        echo "  已更新 GRUB_EARLY_INITRD_LINUX_CUSTOM"
     else
-        # 修改 initrd 行
-        sed -i 's|initrd /acpi_override.cpio /initramfs|initrd /acpi_override.cpio /initramfs|' "$BLS_ENTRY" 2>/dev/null || true
-        sed -i 's|initrd /initramfs|initrd /acpi_override.cpio /initramfs|' "$BLS_ENTRY" 2>/dev/null || true
-        echo "  已更新 BLS: $BLS_ENTRY"
+        echo 'GRUB_EARLY_INITRD_LINUX_CUSTOM="acpi_override.cpio"' >> /etc/default/grub
+        echo "  已添加 GRUB_EARLY_INITRD_LINUX_CUSTOM 到 /etc/default/grub"
     fi
+
+    if command -v update-grub >/dev/null 2>&1; then
+        update-grub >/dev/null 2>&1
+        echo "  已执行: update-grub"
+    elif command -v grub-mkconfig >/dev/null 2>&1; then
+        grub-mkconfig -o /boot/grub/grub.cfg >/dev/null 2>&1
+        echo "  已执行: grub-mkconfig"
+    fi
+else
+    echo "  警告: 找不到 /etc/default/grub，请手动更新引导加载器配置。"
 fi
 echo
 

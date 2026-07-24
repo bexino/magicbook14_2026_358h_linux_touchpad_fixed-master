@@ -22,32 +22,23 @@ else
 fi
 echo
 
-echo "[2/4] 卸载键盘修复..."
-BLS_ENTRIES=$(ls /boot/loader/entries/*.conf 2>/dev/null || echo "")
-
-for BLS_ENTRY in $BLS_ENTRIES; do
-    if [[ -f "$BLS_ENTRY" ]] && grep -q "i8042.dumbkbd=1" "$BLS_ENTRY"; then
-        sed -i 's/i8042.dumbkbd=1 //g' "$BLS_ENTRY"
-        sed -i 's/ i8042.dumbkbd=1//g' "$BLS_ENTRY"
-        sed -i 's/i8042.dumbkbd=1$//g' "$BLS_ENTRY"
-        sed -i 's/  */ /g' "$BLS_ENTRY"
-        echo "  已移除: $(basename "$BLS_ENTRY")"
-    fi
-done
-echo
-
-echo "[3/4] 更新 /etc/default/grub..."
-if grep -q "i8042.dumbkbd=1" /etc/default/grub; then
+echo "[2/3] 卸载键盘修复..."
+if [[ -f /etc/default/grub ]] && grep -q "i8042.dumbkbd=1" /etc/default/grub; then
     sed -i 's/i8042.dumbkbd=1 //g' /etc/default/grub
+    sed -i 's/ i8042.dumbkbd=1//g' /etc/default/grub
+    sed -i 's/i8042.dumbkbd=1$//g' /etc/default/grub
     echo "  已从 /etc/default/grub 移除"
 else
     echo "  /etc/default/grub 中没有键盘参数"
 fi
 echo
 
-echo "[4/4] 更新 GRUB..."
-if command -v grub2-mkconfig >/dev/null 2>&1; then
-    grub2-mkconfig -o /boot/grub2/grub.cfg >/dev/null 2>&1
+echo "[3/3] 更新 GRUB..."
+if command -v update-grub >/dev/null 2>&1; then
+    update-grub >/dev/null 2>&1
+    echo "  已更新 GRUB"
+elif command -v grub-mkconfig >/dev/null 2>&1; then
+    grub-mkconfig -o /boot/grub/grub.cfg >/dev/null 2>&1
     echo "  已更新 GRUB"
 fi
 echo
