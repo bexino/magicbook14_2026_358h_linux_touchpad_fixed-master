@@ -66,7 +66,7 @@ Method (_INI, 0, NotSerialized)
 ```bash
 git clone <repo-url> HONOR_MagicBook14_2026_BCC-N_358H_touchpad_fixed
 cd HONOR_MagicBook14_2026_BCC-N_358H_touchpad_fixed
-sudo bash ./apply_all_fixes.sh
+sudo ./apply_all_fixes.sh
 sudo reboot
 ```
 
