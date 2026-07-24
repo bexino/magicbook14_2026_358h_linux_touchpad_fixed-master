@@ -62,27 +62,23 @@ Method (_INI, 0, NotSerialized)
 
 ## 快速安装
 
-### 触摸板 + 键盘修复（一键安装）
+- 下载：https://github.com/bexino/magicbook14_2026_358h_linux_touchpad_fixed-master/archive/refs/heads/main.zip
+- 解压
+- 在此目录下打开终端
+
+### 1. 修复触摸板
+
 ```bash
-git clone <repo-url> HONOR_MagicBook14_2026_BCC-N_358H_touchpad_fixed
-cd HONOR_MagicBook14_2026_BCC-N_358H_touchpad_fixed
-sudo ./apply_all_fixes.sh
-sudo reboot
+sudo bash apply_patch.sh
 ```
 
-### 单独安装
+### 2. 修复键盘
 
-#### 仅触摸板修复
 ```bash
-sudo ./apply_patch.sh
-sudo reboot
+sudo bash apply_keyboard_fix.sh
 ```
 
-#### 仅键盘修复
-```bash
-sudo ./apply_keyboard_fix.sh
-sudo reboot
-```
+### 3.重启电脑
 
 ## 验证
 
@@ -126,7 +122,6 @@ sudo reboot
 ```
 HONOR_MagicBook14_2026_BCC-N_358H_touchpad_fixed/
 ├── README.md                          # 本文件
-├── apply_all_fixes.sh                 # 一键安装所有修复（触摸板+键盘）
 ├── apply_patch.sh                     # 触摸板修复安装脚本
 ├── apply_keyboard_fix.sh              # 键盘修复安装脚本
 ├── uninstall_patch.sh                 # 卸载脚本（触摸板）
