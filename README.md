@@ -9,6 +9,8 @@
 
 ## 快速启动
 
+- 下载并解压: https://github.com/bexino/magicbook14_fixed/archive/refs/heads/main.zip
+
 ### 交互式向导
 
 ```bash
